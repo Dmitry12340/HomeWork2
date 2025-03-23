@@ -18,18 +18,21 @@ public class Main {
                     new Book("Jane Eyre", 400, 1847), new Book("Plant Breeding", 270, 2000)))
         );
 
-        students.stream().forEach(System.out::println);
+        Optional<Integer> yearOptional = students.stream()
+                //.peek(System.out::println) // вывод каждого студента
+                .flatMap(s -> s.getBooks().stream()) // получение книг
+                //.peek(System.out::println)
+                //.sorted((b1, b2) -> Integer.compare(b1.getPages(), b2.getPages())) // сортировка по количеству страниц
+                //.peek(System.out::println)
+                //.distinct() // оставляем уникальные книги
+                //.peek(System.out::println)
+                //.filter(b -> b.getYearPublication() > 2000) // фильтруем книги после 2000 года
+                //.peek(System.out::println)
+                //.limit(3) // ограничиваем до 3 элементов
+                .map(Book::getYearPublication) // получаем годы выпуска
+                .findAny(); // возвращаем Optional от книги
 
-        // Основная логика стрима
-        Optional<Integer> yearOfFoundBook = students.stream()
-                .flatMap(student -> student.getBooks().stream())
-                .sorted(Comparator.comparingInt(Book::getPages))
-                .distinct()
-                .filter(book -> book.getYearPublication() > 2000)
-                .limit(3)
-                .map(Book::getYearPublication)
-                .reduce((first, second) -> second);
-
-        //System.out.println(yearOfFoundBook.map(String::valueOf).orElse("Книга отсутствует"));
+        // выводим год выпуска найденной книги, либо сообщение об отсутствии
+        System.out.println(yearOptional.map(Object::toString).orElse("Книга отсутствует"));
     }
 }
